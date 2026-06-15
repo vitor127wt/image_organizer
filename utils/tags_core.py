@@ -20,14 +20,15 @@ class TagsList:
     Lolis = Tag(1, "Lolis")
     Ponies = Tag(1, "Ponies")
     Furrie = Tag(2, "Furrie")
+    Unknown = Tag(0, "Unknown")
 
     @classmethod
-    def get_tag(cls, tag_name: str) -> Tag | None:
+    def get_tag(cls, tag_name: str) -> Tag:
 
         try:
             return getattr(cls, tag_name)
         except AttributeError:
-            return None
+            return cls.Unknown
 
     @classmethod
     def set_tag(cls, tag_name: str, nivel: int):
