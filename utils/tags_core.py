@@ -17,9 +17,9 @@ class TagsList:
     NIRL = Tag(0, "NIRL")
     Imagem = Tag(1, "Imagem")
     Video = Tag(1, "Video")
-    Lolis = Tag(1, "Lolis")
-    Ponies = Tag(1, "Ponies")
-    Furrie = Tag(2, "Furrie")
+    Lolis = Tag(2, "Lolis")
+    Ponies = Tag(2, "Ponies")
+    Furrie = Tag(3, "Furrie")
     Unknown = Tag(0, "Unknown")
 
     @classmethod
