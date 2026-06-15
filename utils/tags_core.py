@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import NamedTuple
 
 # Tipo usado para categorizar imagens.
@@ -10,11 +11,16 @@ class Tag(NamedTuple):
     nome: str
 
 
+@dataclass
 class TagsList:
     IRL = Tag(0, "IRL")
     NIRL = Tag(0, "NIRL")
-    FOTOS = Tag(1, "FOTOS")
-    VIDEOS = Tag(1, "VIDEOS")
-    LOLIS = Tag(1, "LOLIS")
-    PONYS = Tag(1, "PONYS")
-    FURRIES = Tag(2, "FURRIES")
+    Imagem = Tag(1, "Imagem")
+    Video = Tag(1, "Video")
+    Lolis = Tag(1, "Lolis")
+    Ponies = Tag(1, "Ponies")
+    Furrie = Tag(2, "Furrie")
+
+
+if __name__ == "__main__":
+    pass

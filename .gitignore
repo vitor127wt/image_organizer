@@ -1,2 +1,13 @@
 .mypy_cache/
 .env/
+.vscode/
+.continue/
+*.png  
+*.jpg
+*.webp
+*.jpeg
+*.gif
+*.btm
+__pycache__/
+*.pyc
+*.json
