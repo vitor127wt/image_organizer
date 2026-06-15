@@ -72,10 +72,11 @@ def save_picture(
 
                 file_iter += 1
 
-    xml, xml_bytes = (
-        generate_xml_template(picture.tags, encode=False),
-        generate_xml_template(picture.tags),
-    )
+    xml = generate_xml_template(picture.tags, encode=False)
+    with open("tag.xml", "w", encoding="utf-8") as f:
+        f.write(str(xml))
+
+    xml_bytes = generate_xml_template(picture.tags)
 
     with Image.open(picture.path) as img:
         new_data = img.info.copy()
@@ -86,22 +87,17 @@ def save_picture(
                 "P",
             ):
                 white_background = Image.new("RGB", img.size, (255, 255, 255))
-
-                if img.mode == "P":
-                    white_background.paste(
-                        img.convert("RGBA"), mask=img.convert("RGBA").split()[3]
-                    )
-                else:
-                    white_background.paste(img, mask=img.split()[3])
-
+                img_rgba = img.convert("RGBA")
+                white_background.paste(img_rgba, mask=img_rgba.split()[3])
                 final_image = white_background
             else:
                 final_image = img
 
             if file_extension in (".jpg", ".jpeg", ".webp"):
+                new_data.pop("exif", None)
                 new_data["xmp"] = xml_bytes
 
-                final_image.save(path, xmp=xml_bytes, **new_data)  # type: ignore
+                final_image.save(path, xmp=new_data["xmp"])  # type: ignore
             elif file_extension == ".png":
                 meta_png = PngImagePlugin.PngInfo()
 
@@ -124,5 +120,8 @@ def save_picture(
 
             return
         except Exception as e:
+            import traceback
+
+            traceback.print_exc()
             print(f"Error saving image with metadata: {e}")
             return None

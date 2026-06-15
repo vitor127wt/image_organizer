@@ -4,9 +4,10 @@ from pathlib import Path
 import imagehash
 from PIL import Image
 
+from utils.files_core import save_picture
 from utils.image_core import PictureData
 
-picture_path = Path("png_data.png")
+picture_path = Path(r"F:\curso_python\image_organizer\png_data.png")
 
 new_picture = PictureData(
     path=picture_path, phash=imagehash.phash(Image.open(picture_path))
@@ -15,5 +16,5 @@ new_picture = PictureData(
 with open("metadata.json", "w", encoding="utf-8") as f:
     json.dump(new_picture.tags, f)
 
-
-print(new_picture.new_path)
+print(new_picture.tags)
+save_picture(new_picture, file_extension=".jpg")
