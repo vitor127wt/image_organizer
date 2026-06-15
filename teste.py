@@ -5,6 +5,7 @@ import imagehash
 from PIL import Image
 
 from utils.image_core import PictureData
+from utils.tags_core import TagsList
 
 picture_path = Path("jpeg_no_data.jpeg")
 
@@ -13,4 +14,7 @@ new_picture = PictureData(
 )
 
 with open("metadata.json", "w", encoding="utf-8") as f:
-    json.dump(new_picture.get_metadata, f)
+    json.dump(new_picture.metadata, f)
+
+
+print(list(TagsList.__dict__.keys()))

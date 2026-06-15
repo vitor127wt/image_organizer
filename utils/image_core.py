@@ -5,7 +5,7 @@ from pathlib import Path
 import imagehash
 from PIL import Image
 
-from .tags_core import Tag
+from .tags_core import Tag, TagsList
 
 
 @dataclass()
@@ -43,45 +43,76 @@ class PictureData:
         return new_path
 
     @property
-    def get_metadata(self) -> None | list[str] | list:
+    def metadata(self) -> list[Tag]:
         try:
             raw_xmp = Image.open(str(self.path)).info.get("xmp")
         except Exception as e:
             print(e)
             raw_xmp = None
-            return raw_xmp
+            # TODO: Add logging
 
-        if raw_xmp is not None:
-            xml_text = (
-                raw_xmp.decode("utf-8", errors="ignore")
-                if isinstance(raw_xmp, bytes)
-                else str(raw_xmp)
-            )
-            tags_xml_digikam_block = re.search(
-                r"<digiKam:TagsList>(.*?)</digiKam:TagsList>",
-                xml_text,
-                re.DOTALL,
-            )
-            if tags_xml_digikam_block:
-                tags_xml = tags_xml_digikam_block.group(1)
-                tags = re.findall(r"<rdf:li>(.*?)</rdf:li>", tags_xml)
-                cleaned_tags = [tag.strip() for tag in tags if tag.strip()]
+        if raw_xmp is None:
+            return self.tags
 
-                return cleaned_tags
+        xml_text = (
+            raw_xmp.decode("utf-8", errors="ignore")
+            if isinstance(raw_xmp, bytes)
+            else str(raw_xmp)
+        )
+        tags_xml_digikam_block = re.search(
+            r"<digiKam:TagsList>(.*?)</digiKam:TagsList>",
+            xml_text,
+            re.DOTALL,
+        )
+        if tags_xml_digikam_block:
+            tags_xml = tags_xml_digikam_block.group(1)
+            tags = re.findall(r"<rdf:li>(.*?)</rdf:li>", tags_xml)
+            cleaned_tags = [tag.strip() for tag in tags if tag.strip()]
 
-            tags_xml_windows_block = re.search(
-                r"<MicrosoftPhoto:LastKeywordXMP>(.*?)</MicrosoftPhoto:LastKeywordXMP>",
-                xml_text,
-                re.DOTALL,
-            )
-            if tags_xml_windows_block:
-                tags_xml = tags_xml_windows_block.group(1)
-                tags = re.findall(r"<rdf:li>(.*?)</rdf:li>", tags_xml)
-                cleaned_tags = [tag.strip() for tag in tags if tag.strip()]
+            self._retrieved_tags = cleaned_tags
+            # TODO: Add logging.
 
-                return cleaned_tags
+            for tag in cleaned_tags:
+                if tag in list(TagsList.__dict__.keys()):
+                    matched_tag = TagsList.get_tag(tag)
+                    if matched_tag is not None:
+                        self._tags.append(matched_tag)
+                else:
+                    TagsList.set_tag(tag, 0)
+                    matched_tag = TagsList.get_tag(tag)
+                    if matched_tag is not None:
+                        self._tags.append(matched_tag)
 
-        return []
+            return self.tags
+
+        tags_xml_windows_block = re.search(
+            r"<MicrosoftPhoto:LastKeywordXMP>(.*?)</MicrosoftPhoto:LastKeywordXMP>",
+            xml_text,
+            re.DOTALL,
+        )
+        if tags_xml_windows_block:
+            tags_xml = tags_xml_windows_block.group(1)
+            tags = re.findall(r"<rdf:li>(.*?)</rdf:li>", tags_xml)
+            cleaned_tags = [tag.strip() for tag in tags if tag.strip()]
+
+            self._retrieved_tags = cleaned_tags
+            # TODO: Add logging.
+
+            for tag in cleaned_tags:
+                if tag in list(TagsList.__dict__.keys()):
+                    matched_tag = TagsList.get_tag(tag)
+                    if matched_tag is not None:
+                        self._tags.append(matched_tag)
+                else:
+                    TagsList.set_tag(tag, 0)
+                    matched_tag = TagsList.get_tag(tag)
+                    if matched_tag is not None:
+                        self._tags.append(matched_tag)
+
+            return self.tags
+
+        # TODO: Add logging.
+        return self.tags
 
 
 if __name__ == "__main__":
